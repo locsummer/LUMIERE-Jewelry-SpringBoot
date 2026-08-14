@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Gửi yêu cầu hỗ trợ')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('support')}"></header>
+<div th:replace="~{fragments/client :: flash}"></div>
+<main class="container layout_padding">
+    <div class="support-form-layout">
+        <div class="support-form-intro"><span>FOODIE CARE</span><h1>Gửi yêu cầu hỗ trợ</h1><p>Hãy mô tả đầy đủ vấn đề. Đội ngũ chăm sóc khách hàng sẽ trao đổi với bạn ngay trên website.</p><ul><li><i class="fa fa-check"></i> Lưu lịch sử trao đổi</li><li><i class="fa fa-check"></i> Theo dõi trạng thái xử lý</li><li><i class="fa fa-check"></i> Liên kết với đơn hàng liên quan</li></ul></div>
+        <form th:action="@{/support/tickets/new}" th:object="${supportForm}" method="post" class="support-form-card">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+            <div class="form-group"><label>Loại vấn đề *</label><select class="form-control" th:field="*{category}"><option value="">-- Chọn nội dung cần hỗ trợ --</option><option th:each="c : ${categories}" th:value="${c}" th:text="${c.label}"></option></select><small class="text-danger" th:errors="*{category}"></small></div>
+            <div class="form-group"><label>Đơn hàng liên quan</label><select class="form-control" th:field="*{orderId}"><option value="">Không liên quan đến đơn hàng</option><option th:each="o : ${orders}" th:value="${o.id}" th:text="'Đơn ngày ' + ${#temporals.format(o.createdAt,'dd/MM/yyyy')} + ' · ' + ${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT')} + ' ₫'"></option></select></div>
+            <div class="form-group"><label>Tiêu đề *</label><input class="form-control" th:field="*{subject}" placeholder="Ví dụ: Chưa được xác nhận thanh toán QR"><small class="text-danger" th:errors="*{subject}"></small></div>
+            <div class="form-group"><label>Mô tả chi tiết *</label><textarea class="form-control" rows="7" th:field="*{message}" placeholder="Mô tả vấn đề, thời điểm xảy ra và thông tin cần cửa hàng kiểm tra..."></textarea><small class="text-danger" th:errors="*{message}"></small></div>
+            <div class="support-form-actions"><a th:href="@{/support}" class="btn btn-outline-secondary">Quay lại</a><button class="btn btn-warning btn-lg" type="submit"><i class="fa fa-paper-plane"></i> Gửi yêu cầu</button></div>
+        </form>
+    </div>
+</main>
+<footer th:replace="~{fragments/client :: footer}"></footer>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

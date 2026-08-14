@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: JewelryShop
+  datasource:
+    url: jdbc:h2:file:./data/jewelryshopdb;MODE=MySQL;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  thymeleaf:
+    cache: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: always
+
+app:
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:LUMIÈRE Jewelry <no-reply@lumiere.local>}
+  payment:
+    bank-name: ${BANK_NAME:MB Bank}
+    bank-id: ${BANK_ID:MB}
+    bank-account: "${BANK_ACCOUNT:663883333}"
+    account-name: ${BANK_ACCOUNT_NAME:NGUYEN QUANG ANH}
+    vnpay-demo: ${VNPAY_DEMO:true}
+
+logging:
+  level:
+    com.agile.jewelryshop: INFO

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head(${editId == null ? 'Thêm tài khoản' : 'Sửa tài khoản'})}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('users')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar(${editId == null ? 'Thêm tài khoản' : 'Cập nhật tài khoản'})}"></header>
+    <div class="admin-content">
+        <form th:action="${editId == null ? '/admin/users/create' : '/admin/users/edit/' + editId}"
+              th:object="${accountForm}" method="post" class="admin-panel form-panel account-form-panel">
+            <div class="panel-head">
+                <div>
+                    <h2 th:text="${editId == null ? 'Tạo tài khoản mới' : 'Thông tin tài khoản'}">Tạo tài khoản</h2>
+                    <p>Admin có thể tạo tài khoản Khách hàng, Nhân viên hoặc Quản trị viên</p>
+                </div>
+                <a th:href="@{/admin/users}" class="btn btn-outline-secondary"><i class="fa fa-arrow-left"></i> Quay lại</a>
+            </div>
+
+            <div class="role-selector">
+                <label th:each="r : ${roles}" class="role-option" th:classappend="'role-' + ${#strings.toLowerCase(r.name())}">
+                    <input type="radio" th:field="*{role}" th:value="${r}">
+                    <span class="role-icon">
+                        <i th:if="${r.name() == 'CUSTOMER'}" class="fa fa-user"></i>
+                        <i th:if="${r.name() == 'STAFF'}" class="fa fa-id-card"></i>
+                        <i th:if="${r.name() == 'ADMIN'}" class="fa fa-shield"></i>
+                    </span>
+                    <span><b th:text="${r.label}">Chức vụ</b><small th:if="${r.name() == 'CUSTOMER'}">Đặt sản phẩm và theo dõi đơn</small><small th:if="${r.name() == 'STAFF'}">Quản lý sản phẩm và xử lý đơn</small><small th:if="${r.name() == 'ADMIN'}">Toàn quyền hệ thống</small></span>
+                </label>
+            </div>
+            <small class="text-danger d-block mb-3" th:errors="*{role}"></small>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group"><label>Họ và tên *</label><input class="form-control" th:field="*{fullName}" placeholder="Nguyễn Văn A"><small class="text-danger" th:errors="*{fullName}"></small></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group"><label>Email đăng nhập *</label><input class="form-control" type="email" th:field="*{email}" placeholder="email@product.vn"><small class="text-danger" th:errors="*{email}"></small></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group"><label th:text="${editId == null ? 'Mật khẩu *' : 'Mật khẩu mới (để trống nếu không đổi)'}">Mật khẩu</label><input class="form-control" type="password" th:field="*{password}" autocomplete="new-password"><small class="text-danger" th:errors="*{password}"></small></div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group"><label>Số điện thoại</label><input class="form-control" th:field="*{phone}" placeholder="0901234567"><small class="text-danger" th:errors="*{phone}"></small></div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group"><label>Địa chỉ</label><textarea class="form-control" rows="3" th:field="*{address}" placeholder="Địa chỉ khách hàng hoặc nhân viên"></textarea><small class="text-danger" th:errors="*{address}"></small></div>
+                </div>
+            </div>
+
+            <div class="custom-control custom-switch mb-4">
+                <input class="custom-control-input" type="checkbox" th:field="*{enabled}" id="enabled">
+                <label class="custom-control-label" for="enabled">Cho phép tài khoản đăng nhập</label>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-warning btn-lg" type="submit"><i class="fa fa-save"></i> Lưu tài khoản & chức vụ</button>
+            </div>
+        </form>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>

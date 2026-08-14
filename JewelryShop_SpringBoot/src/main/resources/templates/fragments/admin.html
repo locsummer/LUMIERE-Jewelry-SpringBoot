@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | Quản lý LUMIÈRE'">Quản lý LUMIÈRE</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<aside th:fragment="sidebar(active)" class="admin-sidebar">
+    <a th:href="@{/admin}" class="admin-logo">LUMIÈRE<span>Admin</span></a>
+    <div class="admin-user"><i class="fa fa-user-circle"></i><div><strong th:text="${currentUser != null ? currentUser.fullName : 'Quản lý'}">Quản lý</strong><small th:text="${currentUser != null ? currentUser.role.label : ''}"></small></div></div>
+    <nav>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? 'active'"><i class="fa fa-dashboard"></i> Tổng quan</a>
+        <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? 'active'"><i class="fa fa-shopping-bag"></i> Đơn hàng</a>
+        <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? 'active'"><i class="fa fa-diamond"></i> Sản phẩm</a>
+        <a th:href="@{/admin/support}" th:classappend="${active == 'support'} ? 'active'"><i class="fa fa-headphones"></i> Chăm sóc khách hàng</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/categories}" th:classappend="${active == 'categories'} ? 'active'"><i class="fa fa-list"></i> Danh mục</a>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/users}" th:classappend="${active == 'users'} ? 'active'"><i class="fa fa-users"></i> Tài khoản</a>
+        <a th:href="@{/}" target="_blank"><i class="fa fa-external-link"></i> Xem website</a>
+    </nav>
+    <form th:action="@{/logout}" method="post" class="admin-logout"><button type="submit"><i class="fa fa-sign-out"></i> Đăng xuất</button></form>
+</aside>
+<header th:fragment="topbar(title)" class="admin-topbar"><h1 th:text="${title}">Quản lý</h1><span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></span></header>
+<div th:fragment="flash" class="admin-flash">
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+</div>
+<th:block th:fragment="scripts"><script th:src="@{/js/jquery-3.4.1.min.js}"></script><script th:src="@{/js/bootstrap.js}"></script><script th:src="@{/js/app.js}"></script></th:block>
+</body>
+</html>

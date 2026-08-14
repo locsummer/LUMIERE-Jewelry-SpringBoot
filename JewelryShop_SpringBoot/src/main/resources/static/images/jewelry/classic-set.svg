@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+<defs>
+ <radialGradient id="bg"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#eee4d0"/></radialGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8e7a5"/><stop offset=".45" stop-color="#d4af37"/><stop offset="1" stop-color="#8c6a19"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-opacity=".18"/></filter>
+</defs>
+<rect width="800" height="600" rx="36" fill="url(#bg)"/>
+<circle cx="650" cy="120" r="90" fill="#fff" opacity=".55"/><circle cx="150" cy="490" r="120" fill="#fff" opacity=".45"/>
+<ellipse cx="300" cy="300" rx="110" ry="80" fill="none" stroke="url(#gold)" stroke-width="25"/><path d="M470 150 Q580 290 470 390" fill="none" stroke="url(#gold)" stroke-width="14"/><circle cx="470" cy="390" r="35" fill="#fff" stroke="url(#gold)" stroke-width="12"/><circle cx="570" cy="180" r="35" fill="#fff" stroke="url(#gold)" stroke-width="12"/><text x="400" y="540" text-anchor="middle" font-family="Georgia,serif" font-size="26" fill="#8a6a2a" letter-spacing="4">LUMIÈRE JEWELRY</text></svg>

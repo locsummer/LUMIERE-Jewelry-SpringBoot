@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head('Chi tiết đơn hàng')}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('orders')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar('Chi tiết đơn hàng')}"></header>
+    <div th:replace="~{fragments/admin :: flash}"></div>
+    <div class="admin-content">
+        <div class="panel-head standalone">
+            <div>
+                <a th:href="@{/admin/orders}"><i class="fa fa-arrow-left"></i> Danh sách đơn</a>
+                <h2 th:text="'Đơn hàng #' + ${order.orderCode}"></h2>
+                <p th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></p>
+            </div>
+            <span class="admin-status big"
+                  th:classappend="'s-' + ${#strings.toLowerCase(order.status.name())}"
+                  th:text="${order.status.label}"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="admin-panel mb-4">
+                    <h3>Sản phẩm đã đặt</h3>
+                    <div th:each="item : ${order.items}" class="admin-order-item">
+                        <img th:src="${item.productImage}" th:alt="${item.productName}">
+                        <div>
+                            <b th:text="${item.productName}"></b>
+                            <small th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + ' ₫ × ' + ${item.quantity}"></small>
+                        </div>
+                        <strong th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + ' ₫'"></strong>
+                    </div>
+                </div>
+
+                <div class="admin-panel mb-4">
+                    <h3>Thông tin giao hàng</h3>
+                    <div class="info-grid">
+                        <span>Người nhận</span><b th:text="${order.customerName}"></b>
+                        <span>Điện thoại</span><b th:text="${order.customerPhone}"></b>
+                        <span>Email</span><b th:text="${order.customerEmail}"></b>
+                        <span>Địa chỉ</span><b th:text="${order.deliveryAddress}"></b>
+                        <span>Ghi chú</span><b th:text="${order.note ?: 'Không có'}"></b>
+                    </div>
+                </div>
+
+                <div class="admin-panel refund-admin waiting"
+                     th:if="${order.paymentStatus.name() == 'REFUND_REQUESTED'}">
+                    <div class="refund-admin-head">
+                        <i class="fa fa-undo"></i>
+                        <div>
+                            <h3>Khách hàng yêu cầu hoàn tiền</h3>
+                            <p th:text="${order.refundReason}"></p>
+                            <small th:if="${order.refundRequestedAt != null}"
+                                   th:text="'Gửi lúc ' + ${#temporals.format(order.refundRequestedAt,'dd/MM/yyyy HH:mm')}"></small>
+                        </div>
+                    </div>
+                    <form th:action="@{/admin/orders/{id}/refund(id=${order.id})}" method="post">
+                        <label for="refundNote">Phản hồi cho khách hàng</label>
+                        <textarea id="refundNote" class="form-control" name="note" rows="3" maxlength="500"
+                                  placeholder="Nhập mã giao dịch hoàn tiền hoặc lý do từ chối..."></textarea>
+                        <div class="refund-actions">
+                            <button class="btn btn-success" type="submit" name="action" value="approve"
+                                    data-confirm="Xác nhận đã hoàn tiền cho khách hàng?">
+                                <i class="fa fa-check"></i> Duyệt hoàn tiền
+                            </button>
+                            <button class="btn btn-outline-danger" type="submit" name="action" value="reject"
+                                    data-confirm="Từ chối yêu cầu hoàn tiền này?">
+                                <i class="fa fa-times"></i> Từ chối
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="admin-panel refund-admin completed"
+                     th:if="${order.paymentStatus.name() == 'REFUNDED' || order.paymentStatus.name() == 'REFUND_REJECTED'}">
+                    <div class="refund-admin-head">
+                        <i class="fa" th:classappend="${order.paymentStatus.name() == 'REFUNDED' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        <div>
+                            <h3 th:text="${order.paymentStatus.label}"></h3>
+                            <p th:text="${order.refundNote ?: 'Không có ghi chú'}"></p>
+                            <small th:if="${order.refundProcessedAt != null}"
+                                   th:text="'Xử lý lúc ' + ${#temporals.format(order.refundProcessedAt,'dd/MM/yyyy HH:mm')}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="admin-panel action-panel">
+                    <h3>Xử lý đơn hàng</h3>
+                    <form th:if="${order.status.name() != 'CANCELLED' && order.status.name() != 'COMPLETED'}"
+                          th:action="@{/admin/orders/{id}/status(id=${order.id})}" method="post">
+                        <label>Trạng thái đơn</label>
+                        <select class="form-control" name="status">
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"
+                                    th:selected="${order.status == s}"></option>
+                        </select>
+                        <button class="btn btn-warning btn-block" type="submit">Cập nhật trạng thái</button>
+                    </form>
+                    <div th:if="${order.status.name() == 'CANCELLED'}" class="alert alert-danger">
+                        Đơn đã hủy và không thể thanh toán thêm.
+                    </div>
+                    <div th:if="${order.status.name() == 'COMPLETED'}" class="alert alert-success">
+                        Đơn hàng đã hoàn thành.
+                    </div>
+
+                    <hr>
+                    <div class="payment-admin-summary">
+                        <label>Trạng thái thanh toán</label>
+                        <strong th:text="${order.paymentStatus.label}"></strong>
+                    </div>
+                    <form th:if="${order.status.name() != 'CANCELLED' && (order.paymentStatus.name() == 'PENDING' || order.paymentStatus.name() == 'PAID')}"
+                          th:action="@{/admin/orders/{id}/payment(id=${order.id})}" method="post">
+                        <select class="form-control" name="paymentStatus">
+                            <option th:each="s : ${paymentStatuses}" th:value="${s}" th:text="${s.label}"
+                                    th:selected="${order.paymentStatus == s}"></option>
+                        </select>
+                        <button class="btn btn-outline-dark btn-block" type="submit">Cập nhật thanh toán</button>
+                    </form>
+
+                    <hr>
+                    <div class="order-totals">
+                        <div><span>Tạm tính</span><b th:text="${#numbers.formatDecimal(order.subtotal,0,'COMMA',0,'POINT')} + ' ₫'"></b></div>
+                        <div><span>Phí giao</span><b th:text="${#numbers.formatDecimal(order.shippingFee,0,'COMMA',0,'POINT')} + ' ₫'"></b></div>
+                        <div class="total"><span>Tổng cộng</span><b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' ₫'"></b></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>

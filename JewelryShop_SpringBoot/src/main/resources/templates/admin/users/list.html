@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head('Quản lý tài khoản & chức vụ')}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('users')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar('Tài khoản & chức vụ')}"></header>
+    <div th:replace="~{fragments/admin :: flash}"></div>
+    <div class="admin-content">
+        <div class="account-stats">
+            <a th:href="@{/admin/users(role='CUSTOMER')}" class="account-stat customer"
+               th:classappend="${selectedRole != null && selectedRole.name() == 'CUSTOMER'} ? 'active'">
+                <i class="fa fa-user"></i>
+                <div><span>Khách hàng</span><strong th:text="${customerCount}">0</strong></div>
+            </a>
+            <a th:href="@{/admin/users(role='STAFF')}" class="account-stat staff"
+               th:classappend="${selectedRole != null && selectedRole.name() == 'STAFF'} ? 'active'">
+                <i class="fa fa-id-card"></i>
+                <div><span>Nhân viên</span><strong th:text="${staffCount}">0</strong></div>
+            </a>
+            <a th:href="@{/admin/users(role='ADMIN')}" class="account-stat admin"
+               th:classappend="${selectedRole != null && selectedRole.name() == 'ADMIN'} ? 'active'">
+                <i class="fa fa-shield"></i>
+                <div><span>Quản trị viên</span><strong th:text="${adminCount}">0</strong></div>
+            </a>
+        </div>
+
+        <div class="admin-panel">
+            <div class="panel-head account-head">
+                <div>
+                    <h2 th:text="${selectedRole == null ? 'Tất cả tài khoản' : 'Tài khoản ' + selectedRole.label}">Tất cả tài khoản</h2>
+                    <p>Phân chia rõ chức vụ Khách hàng – Nhân viên – Quản trị viên</p>
+                </div>
+                <div class="head-actions">
+                    <form th:action="@{/admin/users}" method="get" class="account-search">
+                        <input th:if="${selectedRole != null}" type="hidden" name="role" th:value="${selectedRole}">
+                        <input class="form-control" type="search" name="q" th:value="${keyword}" placeholder="Tìm tên, email, SĐT...">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                    <a th:href="@{/admin/users/create}" class="btn btn-warning"><i class="fa fa-user-plus"></i> Thêm tài khoản</a>
+                </div>
+            </div>
+
+            <div class="account-tabs">
+                <a th:href="@{/admin/users}" th:classappend="${selectedRole == null} ? 'active'">Tất cả</a>
+                <a th:each="r : ${roles}" th:href="@{/admin/users(role=${r})}"
+                   th:classappend="${selectedRole == r} ? 'active'" th:text="${r.label}">Chức vụ</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table">
+                    <thead><tr><th>ID</th><th>Tài khoản</th><th>Liên hệ</th><th>Chức vụ</th><th>Quyền truy cập</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}"></td>
+                        <td><b th:text="${u.fullName}"></b><small th:text="${u.email}"></small></td>
+                        <td><span th:text="${u.phone ?: 'Chưa có'}"></span><small th:text="${u.address ?: 'Chưa có địa chỉ'}"></small></td>
+                        <td>
+                            <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" class="inline-role">
+                                <select class="form-control form-control-sm" name="role" onchange="this.form.submit()">
+                                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r.label}" th:selected="${u.role == r}"></option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <span class="permission-note" th:if="${u.role.name() == 'CUSTOMER'}"><i class="fa fa-shopping-cart"></i> Đặt sản phẩm</span>
+                            <span class="permission-note" th:if="${u.role.name() == 'STAFF'}"><i class="fa fa-shopping-bag"></i> Đơn & sản phẩm</span>
+                            <span class="permission-note" th:if="${u.role.name() == 'ADMIN'}"><i class="fa fa-cogs"></i> Toàn hệ thống</span>
+                        </td>
+                        <td><span class="admin-status" th:classappend="${u.enabled} ? 's-completed' : 's-cancelled'" th:text="${u.enabled ? 'Hoạt động' : 'Đã khóa'}"></span></td>
+                        <td>
+                            <div class="actions">
+                                <a th:href="@{/admin/users/edit/{id}(id=${u.id})}" class="icon-btn edit" title="Sửa tài khoản"><i class="fa fa-pencil"></i></a>
+                                <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post">
+                                    <button class="icon-btn" type="submit" th:title="${u.enabled ? 'Khóa tài khoản' : 'Mở khóa'}" data-confirm="Đổi trạng thái tài khoản này?">
+                                        <i class="fa" th:classappend="${u.enabled ? 'fa-lock' : 'fa-unlock'}"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}"><td colspan="7" class="text-center py-5">Không tìm thấy tài khoản phù hợp</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>

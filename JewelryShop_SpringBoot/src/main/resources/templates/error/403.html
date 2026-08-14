@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Không thể thực hiện yêu cầu')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('')}"></header>
+<main class="error-page">
+    <strong>403</strong>
+    <div th:if="${csrfError}">
+        <h1>Phiên biểu mẫu đã hết hạn</h1>
+        <p>Trang đã mở quá lâu hoặc ứng dụng vừa được khởi động lại. Hãy quay lại trang trước, tải lại trang rồi thực hiện thao tác một lần nữa.</p>
+    </div>
+    <div th:unless="${csrfError}">
+        <h1>Bạn không có quyền truy cập</h1>
+        <p>Vui lòng đăng nhập bằng tài khoản có quyền phù hợp để sử dụng chức năng này.</p>
+    </div>
+    <div class="error-actions">
+        <button th:if="${csrfError}" class="btn btn-outline-dark" type="button" onclick="history.back()">
+            <i class="fa fa-arrow-left"></i> Quay lại và tải lại trang
+        </button>
+        <a th:href="@{/}" class="btn btn-warning"><i class="fa fa-home"></i> Về trang chủ</a>
+    </div>
+</main>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

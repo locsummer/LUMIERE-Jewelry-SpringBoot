@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | LUMIÈRE Jewelry'">LUMIÈRE Jewelry</title>
+    <link rel="icon" th:href="@{/images/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="header(active)" class="client-header">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container">
+            <a class="navbar-brand" th:href="@{/}"><span>LUMIÈRE Jewelry</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item" th:classappend="${active == 'home'} ? 'active'"><a class="nav-link" th:href="@{/}">Trang chủ</a></li>
+                    <li class="nav-item" th:classappend="${active == 'products'} ? 'active'"><a class="nav-link" th:href="@{/products}">Bộ sưu tập</a></li>
+                    <li class="nav-item" th:classappend="${active == 'about'} ? 'active'"><a class="nav-link" th:href="@{/about}">Giới thiệu</a></li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()" th:classappend="${active == 'orders'} ? 'active'"><a class="nav-link" th:href="@{/orders}">Đơn của tôi</a></li>
+                </ul>
+                <div class="user_option">
+                    <a th:href="@{/cart}" class="cart_link position-relative" title="Giỏ hàng">
+                        <i class="fa fa-shopping-cart"></i><span class="cart-badge" th:text="${cartCount}">0</span>
+                    </a>
+                    <a sec:authorize="isAnonymous()" th:href="@{/login}" class="user_link" title="Đăng nhập"><i class="fa fa-user"></i></a>
+                    <div sec:authorize="isAuthenticated()" class="dropdown user-dropdown">
+                        <a href="#" class="user_link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i></a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <span class="dropdown-item-text font-weight-bold" th:text="${currentUser != null ? currentUser.fullName : #authentication.name}">Tài khoản</span>
+                            <a class="dropdown-item" th:href="@{/profile}">Hồ sơ</a>
+                            <a class="dropdown-item" th:href="@{/orders}">Đơn hàng</a>
+                            <a class="dropdown-item" th:href="@{/support/tickets}">Chăm sóc khách hàng</a>
+                            <a class="dropdown-item" sec:authorize="hasAnyRole('ADMIN','STAFF')" th:href="@{/admin/orders}">Trang quản lý</a>
+                            <div class="dropdown-divider"></div>
+                            <form th:action="@{/logout}" method="post"><button class="dropdown-item text-danger" type="submit">Đăng xuất</button></form>
+                        </div>
+                    </div>
+                    <a th:href="@{/products}" class="order_online">Mua ngay</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div th:fragment="flash" class="container flash-wrap">
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="fa fa-check-circle mr-2"></i><span th:text="${success}"></span>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <i class="fa fa-exclamation-circle mr-2"></i><span th:text="${error}"></span>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+</div>
+
+<footer th:fragment="footer" class="footer_section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 footer-col"><div class="footer_contact"><h4>Liên hệ</h4><p><i class="fa fa-map-marker"></i> Hà Nội, Việt Nam</p><p><i class="fa fa-phone"></i> 0900 000 001</p><p><i class="fa fa-envelope"></i> hello@lumiere.vn</p></div></div>
+            <div class="col-md-4 footer-col"><div class="footer_detail"><a th:href="@{/}" class="footer-logo">LUMIÈRE Jewelry</a><p>Đặt sản phẩm nhanh, giao hàng tận nơi. Dự án quản lý bán trang sức trực tuyến bằng Spring Boot.</p></div></div>
+            <div class="col-md-4 footer-col"><h4>Giờ mở cửa</h4><p>Thứ 2 - Chủ nhật</p><p>08:00 - 22:00</p></div>
+        </div>
+        <div class="footer-info"><p>© 2026 LUMIÈRE Jewelry - FPT Polytechnic</p></div>
+    </div>
+</footer>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+</body>
+</html>

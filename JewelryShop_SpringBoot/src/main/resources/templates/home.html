@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Trang chủ')}"></head>
+<body>
+<div class="hero_area">
+    <div class="bg-box"><img th:src="@{/images/hero-jewelry.svg}" alt="LUMIÈRE Jewelry"></div>
+    <header th:replace="~{fragments/client :: header('home')}"></header>
+    <section class="slider_section">
+        <div class="container"><div class="row"><div class="col-md-7"><div class="detail-box">
+            <span class="eyebrow">THIẾT KẾ TINH TẾ • CHẤT LIỆU CAO CẤP</span>
+            <h1>Vẻ đẹp vượt thời gian<br>trong từng món trang sức</h1>
+            <p>Khám phá những thiết kế được tuyển chọn kỹ lưỡng, đặt hàng trực tuyến và nhận trang sức tận nơi.</p>
+            <div class="btn-box"><a th:href="@{/products}" class="btn1">Xem bộ sưu tập</a></div>
+        </div></div></div></div>
+    </section>
+</div>
+<div th:replace="~{fragments/client :: flash}"></div>
+
+<section class="offer_section layout_padding-bottom"><div class="offer_container"><div class="container"><div class="row">
+    <div class="col-md-6"><div class="box"><div class="img-box"><img th:src="@{/images/o1.svg}" alt="Ưu đãi"></div><div class="detail-box"><h5>Ưu đãi hôm nay</h5><h6><span>20%</span> giảm giá</h6><a th:href="@{/products}">Mua ngay <i class="fa fa-shopping-cart"></i></a></div></div></div>
+    <div class="col-md-6"><div class="box"><div class="img-box"><img th:src="@{/images/o2.svg}" alt="Miễn phí giao"></div><div class="detail-box"><h5>Miễn phí vận chuyển</h5><h6>Đơn từ <span>2.000K</span></h6><a th:href="@{/products}">Chọn sản phẩm <i class="fa fa-shopping-cart"></i></a></div></div></div>
+</div></div></div></section>
+
+<section class="product_section layout_padding-bottom"><div class="container">
+    <div class="heading_container heading_center"><h2>Sản phẩm nổi bật</h2><p>Những sản phẩm được khách hàng yêu thích nhất</p></div>
+    <div class="filters-content"><div class="row grid">
+        <div th:each="product : ${featuredProducts}" class="col-sm-6 col-lg-3 all"><div class="box product-card">
+            <div><div class="img-box"><span th:if="${product.discounted}" class="discount-badge" th:text="'-' + ${product.discountPercent} + '%'"></span><img th:src="${product.image}" th:alt="${product.name}"></div>
+            <div class="detail-box"><a class="product-title" th:href="@{/product/{slug}(slug=${product.slug})}" th:text="${product.name}">Sản phẩm</a><p th:text="${#strings.abbreviate(product.description, 90)}"></p>
+                <div class="options"><div class="price-block"><span th:if="${product.discounted}" class="original-price" th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + ' ₫'"></span><h6 th:text="${#numbers.formatDecimal(product.finalPrice,0,'COMMA',0,'POINT')} + ' ₫'"></h6><small th:if="${product.discounted}" th:text="'Giảm ' + ${product.discountPercent} + '%'"></small></div>
+                    <form th:action="@{/cart/add}" method="post"><input type="hidden" name="productId" th:value="${product.id}"><button class="round-cart" type="submit"><i class="fa fa-shopping-cart"></i></button></form>
+                </div>
+            </div></div>
+        </div></div>
+    </div></div>
+    <div class="btn-box"><a th:href="@{/products}">Xem tất cả sản phẩm</a></div>
+</div></section>
+
+<section class="about_section layout_padding"><div class="container"><div class="row"><div class="col-md-6"><div class="img-box"><img th:src="@{/images/about-jewelry.svg}" alt="LUMIÈRE Jewelry"></div></div><div class="col-md-6"><div class="detail-box"><div class="heading_container"><h2>Tinh hoa nằm trong từng chi tiết</h2></div><p>LUMIÈRE Jewelry mang đến những thiết kế thanh lịch, được tạo nên để lưu giữ những khoảnh khắc đáng nhớ. Từ nhẫn, dây chuyền đến bông tai và vòng tay, mỗi sản phẩm đều là một điểm nhấn cho phong cách riêng.</p><a th:href="@{/about}">Câu chuyện LUMIÈRE</a></div></div></div></div></section>
+<footer th:replace="~{fragments/client :: footer}"></footer><th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body></html>

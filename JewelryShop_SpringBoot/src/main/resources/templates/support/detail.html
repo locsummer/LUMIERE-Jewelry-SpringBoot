@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Chi tiết hỗ trợ')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('support')}"></header>
+<div th:replace="~{fragments/client :: flash}"></div>
+<main class="container layout_padding">
+    <div class="support-detail-head"><div><a th:href="@{/support/tickets}"><i class="fa fa-arrow-left"></i> Yêu cầu của tôi</a><h1 th:text="${ticket.subject}"></h1><p><b th:text="${ticket.ticketCode}"></b> · <span th:text="${ticket.category.label}"></span></p></div><span class="support-status large" th:classappend="'support-' + ${#strings.toLowerCase(ticket.status.name())}" th:text="${ticket.status.label}"></span></div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="conversation-card">
+                <div class="conversation-title"><h3>Lịch sử trao đổi</h3><span th:text="${ticket.messages.size()} + ' tin nhắn'"></span></div>
+                <div class="message-thread">
+                    <div th:each="message : ${ticket.messages}" class="support-message" th:classappend="${message.staffMessage} ? 'from-staff' : 'from-customer'">
+                        <div class="message-avatar"><i class="fa" th:classappend="${message.staffMessage} ? 'fa-headphones' : 'fa-user'"></i></div>
+                        <div class="message-body"><div><strong th:text="${message.staffMessage ? 'LUMIÈRE Care · ' + message.sender.fullName : message.sender.fullName}"></strong><small th:text="${#temporals.format(message.createdAt,'dd/MM/yyyy HH:mm')}"></small></div><p th:text="${message.content}"></p></div>
+                    </div>
+                </div>
+                <form th:if="${ticket.status.name() != 'CLOSED'}" th:action="@{/support/tickets/{id}/reply(id=${ticket.id})}" method="post" class="customer-reply-form"><label>Phản hồi thêm</label><textarea name="content" class="form-control" rows="4" minlength="2" maxlength="3000" required placeholder="Nhập nội dung trao đổi với nhân viên hỗ trợ..."></textarea><button class="btn btn-warning mt-3" type="submit"><i class="fa fa-paper-plane"></i> Gửi phản hồi</button></form>
+                <div th:if="${ticket.status.name() == 'CLOSED'}" class="alert alert-secondary mb-0"><i class="fa fa-lock"></i> Yêu cầu này đã được đóng. Hãy tạo yêu cầu mới nếu bạn cần hỗ trợ thêm.</div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="ticket-summary">
+                <h3>Thông tin yêu cầu</h3>
+                <div><span>Mã yêu cầu</span><b th:text="${ticket.ticketCode}"></b></div>
+                <div><span>Loại vấn đề</span><b th:text="${ticket.category.label}"></b></div>
+                <div><span>Mức ưu tiên</span><b class="priority-label" th:classappend="'priority-' + ${#strings.toLowerCase(ticket.priority.name())}" th:text="${ticket.priority.label}"></b></div>
+                <div><span>Ngày gửi</span><b th:text="${#temporals.format(ticket.createdAt,'dd/MM/yyyy HH:mm')}"></b></div>
+                <div><span>Nhân viên phụ trách</span><b th:text="${ticket.assignedTo != null ? ticket.assignedTo.fullName : 'Đang phân công'}"></b></div>
+                <a th:if="${ticket.order != null}" th:href="@{/orders/{id}(id=${ticket.order.id})}" class="btn btn-outline-dark btn-block mt-3"><i class="fa fa-shopping-bag"></i> Xem đơn liên quan</a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/client :: footer}"></footer>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

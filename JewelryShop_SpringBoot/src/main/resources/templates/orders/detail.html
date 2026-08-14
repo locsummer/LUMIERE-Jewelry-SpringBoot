@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Chi tiết đơn hàng')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('orders')}"></header>
+<div th:replace="~{fragments/client :: flash}"></div>
+<main class="container layout_padding">
+    <div class="page-heading">
+        <div>
+            <a th:href="@{/orders}"><i class="fa fa-arrow-left"></i> Danh sách đơn</a>
+            <h1 th:if="${order.paymentMethod.name() != 'BANK_TRANSFER' || order.paymentStatus.name() == 'PAID'}"
+                th:text="'Đơn #' + ${order.orderCode}"></h1>
+            <h1 th:if="${order.paymentMethod.name() == 'BANK_TRANSFER' && order.paymentStatus.name() != 'PAID'}">
+                Đơn hàng chờ thanh toán
+            </h1>
+            <p th:text="'Đặt lúc ' + ${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></p>
+        </div>
+        <span class="status-badge large"
+              th:classappend="'status-' + ${#strings.toLowerCase(order.status.name())}"
+              th:text="${order.status.label}"></span>
+    </div>
+
+    <div th:if="${order.paymentMethod.name() == 'BANK_TRANSFER' && order.paymentStatus.name() == 'PENDING' && order.status.name() != 'CANCELLED'}"
+         class="alert alert-warning order-payment-required">
+        <i class="fa fa-credit-card"></i>
+        <div>
+            <strong>Xin hãy thanh toán đơn hàng của bạn</strong>
+            <span>Đơn chưa thành công và mã đơn hàng chưa được cấp cho đến khi cửa hàng xác nhận thanh toán.</span>
+        </div>
+    </div>
+
+    <div th:if="${order.status.name() == 'CANCELLED'}" class="alert alert-danger order-cancelled-note">
+        <i class="fa fa-ban"></i>
+        <div>
+            <strong>Đơn hàng đã được hủy</strong>
+            <span th:if="${order.paymentStatus.name() == 'CANCELLED'}">Đơn chưa thanh toán nên bạn không cần thực hiện thêm giao dịch.</span>
+            <span th:unless="${order.paymentStatus.name() == 'CANCELLED'}">Mọi chức năng thanh toán của đơn hàng này đã được khóa.</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="detail-card">
+                <h3>Sản phẩm đã đặt</h3>
+                <div th:each="item : ${order.items}" class="order-item">
+                    <img th:src="${item.productImage}" th:alt="${item.productName}">
+                    <div>
+                        <strong th:text="${item.productName}"></strong>
+                        <span th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + ' ₫ × ' + ${item.quantity}"></span>
+                    </div>
+                    <b th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT')} + ' ₫'"></b>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h3>Thông tin giao hàng</h3>
+                <p><b>Người nhận:</b> <span th:text="${order.customerName}"></span></p>
+                <p><b>Điện thoại:</b> <span th:text="${order.customerPhone}"></span></p>
+                <p><b>Địa chỉ:</b> <span th:text="${order.deliveryAddress}"></span></p>
+                <p th:if="${order.note}"><b>Ghi chú:</b> <span th:text="${order.note}"></span></p>
+            </div>
+
+            <div class="detail-card refund-card"
+                 th:if="${order.paymentStatus.name() == 'PAID' && order.status.name() == 'CANCELLED'}">
+                <div class="refund-heading">
+                    <i class="fa fa-undo"></i>
+                    <div>
+                        <h3>Yêu cầu hoàn tiền</h3>
+                        <p>Đơn đã thanh toán và bị hủy. Hãy gửi lý do để cửa hàng kiểm tra.</p>
+                    </div>
+                </div>
+                <form th:action="@{/orders/{id}/refund-request(id=${order.id})}" method="post">
+                    <label for="refundReason">Lý do hoàn tiền *</label>
+                    <textarea id="refundReason" name="reason" class="form-control" rows="4"
+                              minlength="10" maxlength="500" required
+                              placeholder="Ví dụ: Tôi đã thanh toán nhưng đơn hàng đã bị hủy..."></textarea>
+                    <small>Từ 10 đến 500 ký tự.</small>
+                    <button class="btn btn-warning mt-3" type="submit"
+                            data-confirm="Gửi yêu cầu hoàn tiền cho đơn hàng này?">
+                        <i class="fa fa-paper-plane"></i> Gửi yêu cầu hoàn tiền
+                    </button>
+                </form>
+            </div>
+
+            <div class="detail-card refund-status waiting"
+                 th:if="${order.paymentStatus.name() == 'REFUND_REQUESTED'}">
+                <i class="fa fa-clock-o"></i>
+                <div>
+                    <h3>Yêu cầu hoàn tiền đang được xử lý</h3>
+                    <p th:text="'Lý do: ' + ${order.refundReason}"></p>
+                    <small th:if="${order.refundRequestedAt != null}"
+                           th:text="'Đã gửi lúc ' + ${#temporals.format(order.refundRequestedAt,'dd/MM/yyyy HH:mm')}"></small>
+                </div>
+            </div>
+
+            <div class="detail-card refund-status success"
+                 th:if="${order.paymentStatus.name() == 'REFUNDED'}">
+                <i class="fa fa-check-circle"></i>
+                <div>
+                    <h3>Yêu cầu đã được hoàn tiền</h3>
+                    <p>Đơn hàng đã hoàn tất quy trình hoàn tiền.</p>
+                    <small th:if="${order.refundNote != null && !#strings.isEmpty(order.refundNote)}"
+                           th:text="${order.refundNote}"></small>
+                </div>
+            </div>
+
+            <div class="detail-card refund-status rejected"
+                 th:if="${order.paymentStatus.name() == 'REFUND_REJECTED'}">
+                <i class="fa fa-times-circle"></i>
+                <div>
+                    <h3>Yêu cầu hoàn tiền bị từ chối</h3>
+                    <p th:text="'Phản hồi từ cửa hàng: ' + ${order.refundNote}"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <h3>Thanh toán</h3>
+                <div><span>Phương thức</span><strong th:text="${order.paymentMethod.label}"></strong></div>
+                <div>
+                    <span>Trạng thái</span>
+                    <strong class="payment-state"
+                            th:classappend="'payment-' + ${#strings.toLowerCase(order.paymentStatus.name())}"
+                            th:text="${order.paymentStatus.label}"></strong>
+                </div>
+                <hr>
+                <div><span>Tạm tính</span><strong th:text="${#numbers.formatDecimal(order.subtotal,0,'COMMA',0,'POINT')} + ' ₫'"></strong></div>
+                <div><span>Phí giao</span><strong th:text="${#numbers.formatDecimal(order.shippingFee,0,'COMMA',0,'POINT')} + ' ₫'"></strong></div>
+                <div class="total"><span>Tổng cộng</span><strong th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' ₫'"></strong></div>
+
+                <a th:if="${order.status.name() != 'CANCELLED' && order.paymentStatus.name() == 'PENDING' && order.paymentMethod.name() == 'BANK_TRANSFER'}"
+                   th:href="@{/payment/bank/order/{id}(id=${order.id})}"
+                   class="btn btn-warning btn-block mt-3">Thanh toán chuyển khoản</a>
+                <a th:if="${order.status.name() != 'CANCELLED' && order.paymentStatus.name() == 'PENDING' && order.paymentMethod.name() == 'VNPAY'}"
+                   th:href="@{/payment/vnpay/{code}(code=${order.orderCode})}"
+                   class="btn btn-danger btn-block mt-3">Thanh toán VNPay</a>
+
+                <form th:if="${order.status.name() == 'PENDING' || order.status.name() == 'CONFIRMED'}"
+                      th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" class="mt-3">
+                    <button class="btn btn-outline-danger btn-block" type="submit"
+                            data-confirm="Bạn chắc chắn muốn hủy đơn? Sau khi hủy sẽ không thể thanh toán.">
+                        Hủy đơn hàng
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/client :: footer}"></footer>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

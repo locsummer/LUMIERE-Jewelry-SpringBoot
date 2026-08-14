@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/client :: head('Trung tâm chăm sóc khách hàng')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('support')}"></header>
+<div th:replace="~{fragments/client :: flash}"></div>
+<main>
+    <section class="support-hero">
+        <div class="container">
+            <span class="support-eyebrow"><i class="fa fa-heart"></i> FOODIE CARE</span>
+            <h1>Chúng tôi có thể giúp gì cho bạn?</h1>
+            <p>Tra cứu hướng dẫn nhanh hoặc gửi yêu cầu để đội ngũ LUMIÈRE hỗ trợ trực tiếp.</p>
+            <div class="support-hero-actions">
+                <a sec:authorize="isAuthenticated()" th:href="@{/support/tickets/new}" class="btn btn-warning btn-lg">
+                    <i class="fa fa-paper-plane"></i> Gửi yêu cầu hỗ trợ
+                </a>
+                <a sec:authorize="isAuthenticated()" th:href="@{/support/tickets}" class="btn btn-outline-light btn-lg">
+                    <i class="fa fa-comments"></i> Yêu cầu của tôi
+                </a>
+                <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-warning btn-lg">
+                    Đăng nhập để được hỗ trợ
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="container support-section">
+        <div class="heading_container heading_center"><h2>Hỗ trợ nhanh</h2><p>Chọn nội dung bạn đang cần trợ giúp</p></div>
+        <div class="support-topic-grid">
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-shopping-bag"></i><strong>Đơn hàng</strong><span>Hủy đơn, thay đổi thông tin, theo dõi trạng thái</span></a>
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-credit-card"></i><strong>Thanh toán</strong><span>QR MB Bank, VNPay và xác nhận giao dịch</span></a>
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-undo"></i><strong>Hoàn tiền</strong><span>Kiểm tra yêu cầu và tiến độ hoàn tiền</span></a>
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-motorcycle"></i><strong>Giao hàng</strong><span>Địa chỉ, thời gian giao và tình trạng sản phẩm</span></a>
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-user-circle"></i><strong>Tài khoản</strong><span>Đăng nhập, hồ sơ và bảo mật tài khoản</span></a>
+            <a th:href="@{/support/tickets/new}" class="support-topic"><i class="fa fa-gift"></i><strong>Khuyến mãi</strong><span>Giảm giá, ưu đãi và điều kiện áp dụng</span></a>
+        </div>
+    </section>
+
+    <section class="support-faq">
+        <div class="container">
+            <div class="heading_container heading_center"><h2>Câu hỏi thường gặp</h2></div>
+            <div id="faqAccordion" class="faq-list">
+                <div class="faq-item"><button data-toggle="collapse" data-target="#faq1">Làm sao để theo dõi đơn hàng?<i class="fa fa-angle-down"></i></button><div id="faq1" class="collapse show" data-parent="#faqAccordion"><p>Đăng nhập, chọn “Đơn của tôi” để xem trạng thái xác nhận, chuẩn bị, giao hàng và hoàn tất.</p></div></div>
+                <div class="faq-item"><button data-toggle="collapse" data-target="#faq2">Thanh toán QR bao lâu được xác nhận?<i class="fa fa-angle-down"></i></button><div id="faq2" class="collapse" data-parent="#faqAccordion"><p>Sau khi chuyển tiền và gửi xác nhận, nhân viên sẽ kiểm tra giao dịch rồi cập nhật trạng thái thanh toán.</p></div></div>
+                <div class="faq-item"><button data-toggle="collapse" data-target="#faq3">Khi nào tôi được yêu cầu hoàn tiền?<i class="fa fa-angle-down"></i></button><div id="faq3" class="collapse" data-parent="#faqAccordion"><p>Bạn có thể gửi yêu cầu hoàn tiền khi đơn đã thanh toán nhưng bị hủy. Cửa hàng sẽ phản hồi ngay trong chi tiết đơn.</p></div></div>
+                <div class="faq-item"><button data-toggle="collapse" data-target="#faq4">Tôi có thể hủy đơn đã chuẩn bị không?<i class="fa fa-angle-down"></i></button><div id="faq4" class="collapse" data-parent="#faqAccordion"><p>Khách hàng chỉ có thể tự hủy khi đơn đang chờ xác nhận hoặc đã xác nhận. Sau đó hãy liên hệ CSKH để được kiểm tra.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container support-contact">
+        <div><i class="fa fa-phone"></i><span>Hotline</span><strong>1900 6868</strong><small>08:00 – 22:00 mỗi ngày</small></div>
+        <div><i class="fa fa-envelope"></i><span>Email</span><strong>support@lumiere.vn</strong><small>Phản hồi trong vòng 24 giờ</small></div>
+        <div><i class="fa fa-comments"></i><span>Hỗ trợ trực tuyến</span><strong>Phiếu CSKH</strong><small>Lưu đầy đủ lịch sử trao đổi</small></div>
+    </section>
+</main>
+<footer th:replace="~{fragments/client :: footer}"></footer>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

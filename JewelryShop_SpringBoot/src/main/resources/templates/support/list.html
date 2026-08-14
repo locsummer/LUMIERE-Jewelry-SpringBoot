@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Yêu cầu hỗ trợ của tôi')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('support')}"></header>
+<div th:replace="~{fragments/client :: flash}"></div>
+<main class="container layout_padding">
+    <div class="page-heading">
+        <div><h1>Yêu cầu hỗ trợ của tôi</h1><p>Theo dõi phản hồi từ đội ngũ chăm sóc khách hàng</p></div>
+        <a th:href="@{/support/tickets/new}" class="btn btn-warning"><i class="fa fa-plus"></i> Gửi yêu cầu mới</a>
+    </div>
+    <div th:if="${#lists.isEmpty(tickets)}" class="empty-state">
+        <i class="fa fa-comments-o"></i><h3>Bạn chưa có yêu cầu hỗ trợ</h3>
+        <p>Nếu cần giúp đỡ, hãy gửi yêu cầu và chúng tôi sẽ sớm phản hồi.</p>
+        <a th:href="@{/support/tickets/new}" class="btn btn-warning">Liên hệ CSKH</a>
+    </div>
+    <div class="ticket-list">
+        <a th:each="ticket : ${tickets}" th:href="@{/support/tickets/{id}(id=${ticket.id})}" class="ticket-card">
+            <div class="ticket-icon"><i class="fa fa-comments"></i></div>
+            <div class="ticket-main"><div><strong th:text="${ticket.subject}"></strong><span class="ticket-code" th:text="${ticket.ticketCode}"></span></div><p><span th:text="${ticket.category.label}"></span> · <span th:text="${ticket.messages.size()} + ' tin nhắn'"></span></p></div>
+            <div class="ticket-side"><span class="support-status" th:classappend="'support-' + ${#strings.toLowerCase(ticket.status.name())}" th:text="${ticket.status.label}"></span><small th:text="${#temporals.format(ticket.updatedAt,'dd/MM/yyyy HH:mm')}"></small></div>
+            <i class="fa fa-angle-right"></i>
+        </a>
+    </div>
+</main>
+<footer th:replace="~{fragments/client :: footer}"></footer>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

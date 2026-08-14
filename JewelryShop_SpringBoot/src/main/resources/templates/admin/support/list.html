@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head('Chăm sóc khách hàng')}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('support')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar('Chăm sóc khách hàng')}"></header>
+    <div th:replace="~{fragments/admin :: flash}"></div>
+    <div class="admin-content">
+        <div class="support-admin-stats">
+            <div><i class="fa fa-inbox"></i><span>Mới tiếp nhận</span><strong th:text="${openCount}"></strong></div>
+            <div><i class="fa fa-spinner"></i><span>Đang xử lý</span><strong th:text="${processingCount}"></strong></div>
+            <div><i class="fa fa-reply"></i><span>Chờ khách phản hồi</span><strong th:text="${waitingCount}"></strong></div>
+        </div>
+        <div class="admin-panel">
+            <div class="panel-head">
+                <div><h2>Phiếu yêu cầu CSKH</h2><p>Tiếp nhận, trao đổi và theo dõi vấn đề của khách hàng</p></div>
+                <form th:action="@{/admin/support}" method="get" class="support-admin-filters">
+                    <input class="form-control" name="q" th:value="${keyword}" placeholder="Mã phiếu, khách hàng...">
+                    <select class="form-control" name="status"><option value="">Tất cả trạng thái</option><option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${selectedStatus == s}"></option></select>
+                    <select class="form-control" name="category"><option value="">Tất cả loại vấn đề</option><option th:each="c : ${categories}" th:value="${c}" th:text="${c.label}" th:selected="${selectedCategory == c}"></option></select>
+                    <button class="btn btn-warning" type="submit"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table admin-table support-admin-table">
+                    <thead><tr><th>Yêu cầu</th><th>Khách hàng</th><th>Phân loại</th><th>Ưu tiên</th><th>Cập nhật</th><th>Trạng thái</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="ticket : ${tickets}">
+                        <td><b th:text="${ticket.subject}"></b><small th:text="${ticket.ticketCode} + ' · ' + ${ticket.messages.size()} + ' tin nhắn'"></small></td>
+                        <td><span th:text="${ticket.customer.fullName}"></span><small th:text="${ticket.customer.email}"></small></td>
+                        <td th:text="${ticket.category.label}"></td>
+                        <td><span class="priority-label" th:classappend="'priority-' + ${#strings.toLowerCase(ticket.priority.name())}" th:text="${ticket.priority.label}"></span></td>
+                        <td th:text="${#temporals.format(ticket.updatedAt,'dd/MM HH:mm')}"></td>
+                        <td><span class="support-status" th:classappend="'support-' + ${#strings.toLowerCase(ticket.status.name())}" th:text="${ticket.status.label}"></span></td>
+                        <td><a class="icon-btn" th:href="@{/admin/support/{id}(id=${ticket.id})}"><i class="fa fa-eye"></i></a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(tickets)}"><td colspan="7" class="text-center">Không có yêu cầu phù hợp</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>

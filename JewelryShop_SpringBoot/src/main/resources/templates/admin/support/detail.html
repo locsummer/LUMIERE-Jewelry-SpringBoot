@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head('Xử lý yêu cầu CSKH')}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('support')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar('Xử lý yêu cầu CSKH')}"></header>
+    <div th:replace="~{fragments/admin :: flash}"></div>
+    <div class="admin-content">
+        <div class="panel-head standalone"><div><a th:href="@{/admin/support}"><i class="fa fa-arrow-left"></i> Danh sách yêu cầu</a><h2 class="mt-2" th:text="${ticket.subject}"></h2><p th:text="${ticket.ticketCode} + ' · ' + ${ticket.category.label}"></p></div><span class="support-status large" th:classappend="'support-' + ${#strings.toLowerCase(ticket.status.name())}" th:text="${ticket.status.label}"></span></div>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="admin-panel support-thread-panel">
+                    <div class="panel-head"><div><h2>Trao đổi với khách hàng</h2><p th:text="${ticket.messages.size()} + ' tin nhắn trong cuộc hội thoại'"></p></div></div>
+                    <div class="message-thread admin-thread">
+                        <div th:each="message : ${ticket.messages}" class="support-message" th:classappend="${message.staffMessage} ? 'from-staff' : 'from-customer'">
+                            <div class="message-avatar"><i class="fa" th:classappend="${message.staffMessage} ? 'fa-headphones' : 'fa-user'"></i></div>
+                            <div class="message-body"><div><strong th:text="${message.staffMessage ? 'LUMIÈRE Care · ' + message.sender.fullName : message.sender.fullName}"></strong><small th:text="${#temporals.format(message.createdAt,'dd/MM/yyyy HH:mm')}"></small></div><p th:text="${message.content}"></p></div>
+                        </div>
+                    </div>
+                    <form th:if="${ticket.status.name() != 'CLOSED'}" th:action="@{/admin/support/{id}/reply(id=${ticket.id})}" method="post" class="admin-support-reply"><label>Phản hồi khách hàng</label><textarea class="form-control" name="content" rows="5" minlength="2" maxlength="3000" required placeholder="Nhập hướng dẫn hoặc kết quả xử lý..."></textarea><button class="btn btn-warning mt-3" type="submit"><i class="fa fa-reply"></i> Gửi phản hồi</button></form>
+                    <div th:if="${ticket.status.name() == 'CLOSED'}" class="alert alert-secondary mb-0"><i class="fa fa-lock"></i> Phiếu đã đóng. Hãy đổi trạng thái nếu cần xử lý lại.</div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="admin-panel action-panel">
+                    <h3>Thông tin khách hàng</h3>
+                    <div class="info-grid"><span>Họ tên</span><b th:text="${ticket.customer.fullName}"></b><span>Email</span><b th:text="${ticket.customer.email}"></b><span>Điện thoại</span><b th:text="${ticket.customer.phone ?: 'Chưa cập nhật'}"></b><span>Ngày gửi</span><b th:text="${#temporals.format(ticket.createdAt,'dd/MM/yyyy HH:mm')}"></b><span>Ưu tiên</span><b class="priority-label" th:classappend="'priority-' + ${#strings.toLowerCase(ticket.priority.name())}" th:text="${ticket.priority.label}"></b><span>Phụ trách</span><b th:text="${ticket.assignedTo != null ? ticket.assignedTo.fullName : 'Chưa phân công'}"></b></div>
+                    <a th:if="${ticket.order != null}" th:href="@{/admin/orders/{id}(id=${ticket.order.id})}" class="btn btn-outline-dark btn-block mt-3"><i class="fa fa-shopping-bag"></i> Xem đơn liên quan</a>
+                </div>
+                <div class="admin-panel action-panel mt-3">
+                    <h3>Cập nhật xử lý</h3>
+                    <form th:action="@{/admin/support/{id}/status(id=${ticket.id})}" method="post"><label>Trạng thái yêu cầu</label><select class="form-control" name="status"><option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}" th:selected="${ticket.status == s}"></option></select><button class="btn btn-dark btn-block" type="submit"><i class="fa fa-save"></i> Cập nhật trạng thái</button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>

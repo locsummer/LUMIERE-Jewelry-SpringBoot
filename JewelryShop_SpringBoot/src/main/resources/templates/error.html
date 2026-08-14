@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/client :: head('Đã xảy ra lỗi')}"></head>
+<body>
+<header th:replace="~{fragments/client :: header('')}"></header>
+<main class="error-page">
+    <strong th:text="${status != null ? status : 'Oops'}">Oops</strong>
+    <h1 th:text="${status == 404 ? 'Không tìm thấy trang' : 'Hệ thống chưa thể xử lý yêu cầu'}">Đã xảy ra lỗi</h1>
+    <p th:text="${status == 404 ? 'Đường dẫn bạn truy cập không tồn tại hoặc đã được thay đổi.' : 'Vui lòng quay lại trang trước và thử lại. Nếu lỗi tiếp tục xảy ra, hãy liên hệ bộ phận chăm sóc khách hàng.'}"></p>
+    <div class="error-actions">
+        <button class="btn btn-outline-dark" type="button" onclick="history.back()"><i class="fa fa-arrow-left"></i> Quay lại</button>
+        <a th:href="@{/}" class="btn btn-warning"><i class="fa fa-home"></i> Về trang chủ</a>
+    </div>
+</main>
+<th:block th:replace="~{fragments/client :: scripts}"></th:block>
+</body>
+</html>

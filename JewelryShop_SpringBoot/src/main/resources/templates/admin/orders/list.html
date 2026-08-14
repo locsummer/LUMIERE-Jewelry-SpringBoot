@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin :: head('Quản lý đơn hàng')}"></head>
+<body>
+<aside th:replace="~{fragments/admin :: sidebar('orders')}"></aside>
+<main class="admin-main">
+    <header th:replace="~{fragments/admin :: topbar('Quản lý đơn hàng')}"></header>
+    <div th:replace="~{fragments/admin :: flash}"></div>
+    <div class="admin-content">
+        <div class="admin-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Danh sách đơn hàng</h2>
+                    <p>Nhân viên xác nhận đơn, cập nhật giao sản phẩm và xử lý yêu cầu hoàn tiền</p>
+                </div>
+                <form th:action="@{/admin/orders}" method="get" class="order-filters">
+                    <select class="form-control" name="status" onchange="this.form.submit()">
+                        <option value="">Tất cả trạng thái đơn</option>
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"
+                                th:selected="${selectedStatus == s}"></option>
+                    </select>
+                    <select class="form-control" name="paymentStatus" onchange="this.form.submit()">
+                        <option value="">Tất cả thanh toán</option>
+                        <option th:each="s : ${allPaymentStatuses}" th:value="${s}" th:text="${s.label}"
+                                th:selected="${selectedPaymentStatus == s}"></option>
+                    </select>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table admin-table">
+                    <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Thời gian</th>
+                        <th>Thanh toán</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td><b th:text="${order.orderCode}"></b><small th:text="${order.items.size()} + ' sản phẩm'"></small></td>
+                        <td><span th:text="${order.customerName}"></span><small th:text="${order.customerPhone}"></small></td>
+                        <td th:text="${#temporals.format(order.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span th:text="${order.paymentMethod.label}"></span>
+                            <small class="admin-payment-state"
+                                   th:classappend="'p-' + ${#strings.toLowerCase(order.paymentStatus.name())}"
+                                   th:text="${order.paymentStatus.label}"></small>
+                        </td>
+                        <td><b th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' ₫'"></b></td>
+                        <td>
+                            <span class="admin-status"
+                                  th:classappend="'s-' + ${#strings.toLowerCase(order.status.name())}"
+                                  th:text="${order.status.label}"></span>
+                        </td>
+                        <td><a class="icon-btn" th:href="@{/admin/orders/{id}(id=${order.id})}"><i class="fa fa-eye"></i></a></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="7" class="text-center">Không có đơn phù hợp</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<th:block th:replace="~{fragments/admin :: scripts}"></th:block>
+</body>
+</html>
