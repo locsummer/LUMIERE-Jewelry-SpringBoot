@@ -44,8 +44,8 @@ app:
   payment:
     bank-name: ${BANK_NAME:MB Bank}
     bank-id: ${BANK_ID:MB}
-    bank-account: "${BANK_ACCOUNT:663883333}"
-    account-name: ${BANK_ACCOUNT_NAME:NGUYEN QUANG ANH}
+    bank-account: "${BANK_ACCOUNT:0969290908}"
+    account-name: ${BANK_ACCOUNT_NAME:NGUYEN XUAN LOC}
     vnpay-demo: ${VNPAY_DEMO:true}
 
 logging:
