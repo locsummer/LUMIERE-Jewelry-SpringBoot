@@ -155,7 +155,7 @@ public class CheckoutController {
         return UriComponentsBuilder
                 .fromUriString("https://img.vietqr.io/image/{bankId}-{accountNo}-compact.png")
                 .queryParam("amount", order.getTotalAmount().stripTrailingZeros().toPlainString())
-                .queryParam("addInfo", "LUMIERE " + order.getOrderCode())
+                .queryParam("addInfo", "THANH TOAN")
                 .queryParam("accountName", accountName)
                 .buildAndExpand(bankId, bankAccount)
                 .encode()
